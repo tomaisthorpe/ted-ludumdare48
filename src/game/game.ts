@@ -1,12 +1,6 @@
 import { TGameState, TEngine } from "@tedengine/ted";
 
-class GameState extends TGameState {
-  public async onCreate(engine: TEngine) {
-    this.onReady(engine);
-  }
-
-  public onReady(engine: TEngine) {}
-}
+class GameState extends TGameState {}
 
 const config = {
   states: {
