@@ -6,6 +6,7 @@ export default defineConfig({
   define: {
     global: {},
   },
+  assetsInclude: ["**/*.obj", "**/*.mtl"],
   plugins: [
     react(),
     viteStaticCopy({
