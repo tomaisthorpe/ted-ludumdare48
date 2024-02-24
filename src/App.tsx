@@ -1,13 +1,13 @@
 import "./App.css";
-import Game from "./game/game?worker";
 
 import { TGame } from "@tedengine/ted";
+import game from "./game/game?worker";
 
 function App() {
   return (
     <>
       <div>
-        <TGame game={new Game()} />
+        <TGame game={new game()} />
       </div>
     </>
   );
