@@ -1,4 +1,4 @@
-import { vec3 } from "gl-matrix";
+import { quat, vec3 } from "gl-matrix";
 import {
   TController,
   TPawn,
@@ -19,9 +19,9 @@ export default class Ship extends TPawn {
     x: number;
     y: number;
   } = {
-    x: 0,
-    y: 0,
-  };
+      x: 0,
+      y: 0,
+    };
   private readonly speed = 100;
   private readonly friction = 0.9;
 
@@ -38,6 +38,7 @@ export default class Ship extends TPawn {
 
   public setupController(controller: TController): void {
     super.setupController(controller);
+    controller.enableMouseTracking();
 
     controller.bindAction("Shoot", "pressed", this.shootPressed);
   }
@@ -56,10 +57,27 @@ export default class Ship extends TPawn {
     this.velocity.x *= this.friction;
     this.velocity.y *= this.friction;
 
+    // Rotate the ship towards the mouse
+    const mouse = this.controller.mouseLocation;
+    if (mouse?.worldX && mouse?.worldY) {
+      const dx = this.rootComponent.transform.translation[0] - mouse.worldX;
+      const dy = this.rootComponent.transform.translation[1] - mouse.worldY;
+      const theta = Math.atan2(dy, dx);
+
+      const q = quat.fromEuler(
+        quat.create(),
+        0,
+        0,
+        (theta * 180) / Math.PI - 90,
+      );
+
+      this.rootComponent.transform.rotation = q;
+    }
+
     this.rootComponent.transform.translation = vec3.add(
       vec3.create(),
       this.rootComponent.transform.translation,
-      vec3.fromValues(this.velocity.x, this.velocity.y, 0)
+      vec3.fromValues(this.velocity.x, this.velocity.y, 0),
     );
   }
 
