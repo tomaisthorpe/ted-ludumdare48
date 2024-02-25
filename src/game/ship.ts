@@ -19,13 +19,20 @@ export default class Ship extends TPawn {
     x: number;
     y: number;
   } = {
-      x: 0,
-      y: 0,
-    };
+    x: 0,
+    y: 0,
+  };
   private readonly speed = 100;
   private readonly friction = 0.9;
+  private readonly fireRate = 0.2;
 
-  constructor(engine: TEngine) {
+  private lastShot = 0;
+  private theta = 0;
+
+  constructor(
+    engine: TEngine,
+    private onShoot: (x: number, y: number, theta: number) => void
+  ) {
     super();
 
     const mesh = new TMeshComponent(engine, this);
@@ -40,7 +47,7 @@ export default class Ship extends TPawn {
     super.setupController(controller);
     controller.enableMouseTracking();
 
-    controller.bindAction("Shoot", "pressed", this.shootPressed);
+    controller.bindAction("Shoot", "pressed", this.shootPressed.bind(this));
   }
 
   public onUpdate(_: TEngine, dt: number) {
@@ -62,13 +69,13 @@ export default class Ship extends TPawn {
     if (mouse?.worldX && mouse?.worldY) {
       const dx = this.rootComponent.transform.translation[0] - mouse.worldX;
       const dy = this.rootComponent.transform.translation[1] - mouse.worldY;
-      const theta = Math.atan2(dy, dx);
+      this.theta = Math.atan2(dy, dx);
 
       const q = quat.fromEuler(
         quat.create(),
         0,
         0,
-        (theta * 180) / Math.PI - 90,
+        (this.theta * 180) / Math.PI - 90
       );
 
       this.rootComponent.transform.rotation = q;
@@ -77,11 +84,23 @@ export default class Ship extends TPawn {
     this.rootComponent.transform.translation = vec3.add(
       vec3.create(),
       this.rootComponent.transform.translation,
-      vec3.fromValues(this.velocity.x, this.velocity.y, 0),
+      vec3.fromValues(this.velocity.x, this.velocity.y, 0)
     );
   }
 
   public shootPressed() {
-    console.log("omg");
+    const now = performance.now();
+
+    const canShoot = now - this.lastShot > this.fireRate;
+    if (!canShoot) {
+      return;
+    }
+
+    this.lastShot = now;
+
+    const transform = this.rootComponent.transform;
+    const [x, y] = transform.translation;
+
+    this.onShoot(x, y, this.theta + Math.PI);
   }
 }

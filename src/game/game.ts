@@ -11,6 +11,7 @@ import { generatePlanetBackground } from "./planet-background";
 import { vec3 } from "gl-matrix";
 import Ship from "./ship";
 import Controller from "./controller";
+import Bullet from "./bullet";
 
 class Planet extends TActor {
   constructor(engine: TEngine, texture: TTexture) {
@@ -40,11 +41,22 @@ class GameState extends TGameState {
     const planet = new Planet(engine, this.background!);
     this.addActor(planet);
 
-    const ship = new Ship(engine);
+    const onShoot = this.onShootHandler(engine).bind(this);
+
+    const ship = new Ship(engine, onShoot);
     this.addActor(ship);
 
     const controller = new Controller(engine);
     controller.possess(ship);
+  }
+
+  public onShootHandler(
+    engine: TEngine
+  ): (x: number, y: number, theta: number) => void {
+    return (x: number, y: number, theta: number) => {
+      const bullet = new Bullet(engine, x, y, theta);
+      this.addActor(bullet);
+    };
   }
 }
 
