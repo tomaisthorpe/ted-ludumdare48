@@ -40,12 +40,14 @@ class GameState extends TGameState {
     const planet = new Planet(engine, this.background!);
     this.addActor(planet);
 
-    const ship = new Ship(engine);
+    const ship = new Ship(engine, onShoot);
     this.addActor(ship);
 
     const controller = new Controller(engine);
     controller.possess(ship);
   }
+
+  public onShoot(x: number, y: number) { }
 }
 
 const config = {

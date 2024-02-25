@@ -24,8 +24,11 @@ export default class Ship extends TPawn {
     };
   private readonly speed = 100;
   private readonly friction = 0.9;
+  private readonly fireRate = 0.2;
 
-  constructor(engine: TEngine) {
+  private lastShot = 0;
+
+  constructor(private engine: TEngine, private onShoot: (x: number, y: number): void) {
     super();
 
     const mesh = new TMeshComponent(engine, this);
@@ -82,6 +85,18 @@ export default class Ship extends TPawn {
   }
 
   public shootPressed() {
-    console.log("omg");
+    const now = performance.now();
+
+    const canShoot = now - this.lastShot > this.fireRate;
+    if (!canShoot) {
+      return;
+    }
+
+    this.lastShot = now;
+
+    const transform = this.rootComponent.transform;
+    const [x, y] = transform.translation;
+
+    this.onShoot(x, y);
   }
 }
