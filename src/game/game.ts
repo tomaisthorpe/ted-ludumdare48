@@ -7,11 +7,12 @@ import {
   TOrthographicCamera,
   TResourcePack,
 } from "@tedengine/ted";
-import { generatePlanetBackground } from "./planet-background";
+import { generatePlanet } from "./generate-planet";
 import { vec3 } from "gl-matrix";
 import Ship from "./ship";
 import Controller from "./controller";
 import Bullet from "./bullet";
+import { planetTypes } from "./config";
 
 class Planet extends TActor {
   constructor(engine: TEngine, texture: TTexture) {
@@ -31,7 +32,8 @@ class GameState extends TGameState {
     const rp = new TResourcePack(engine, Ship.resources);
     await rp.load();
 
-    this.background = await generatePlanetBackground(engine);
+    const result = await generatePlanet(engine, planetTypes[0]);
+    this.background = result.texture;
 
     this.activeCamera = new TOrthographicCamera();
     this.onReady(engine);
