@@ -7,7 +7,14 @@ function App() {
   return (
     <>
       <div>
-        <TGame game={new game()} />
+        <TGame
+          config={{
+            renderWidth: 800,
+            renderHeight: 600,
+            imageRendering: "pixelated",
+          }}
+          game={new game()}
+        />
       </div>
     </>
   );

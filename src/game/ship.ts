@@ -2,17 +2,17 @@ import { quat, vec3 } from "gl-matrix";
 import {
   TController,
   TPawn,
-  TMeshComponent,
   TResourcePackConfig,
+  TSceneComponent,
+  TSphereCollider,
+  TSpriteComponent,
 } from "@tedengine/ted";
 import type { TEngine } from "@tedengine/ted";
-import shipMesh from "../assets/ship.obj";
-import shipMtl from "../assets/ship.mtl";
+import shipTexture from "../assets/player.png";
 
 export default class Ship extends TPawn {
   public static resources: TResourcePackConfig = {
-    meshes: [shipMesh],
-    materials: [shipMtl],
+    textures: [shipTexture],
   };
 
   private velocity: {
@@ -29,18 +29,23 @@ export default class Ship extends TPawn {
   private lastShot = 0;
   private theta = 0;
 
+  private sprite: TSpriteComponent;
+
   constructor(
     engine: TEngine,
     private onShoot: (x: number, y: number, theta: number) => void
   ) {
     super();
 
-    const mesh = new TMeshComponent(engine, this);
-    mesh.applyMesh(engine, shipMesh);
-    mesh.applyMaterial(engine, shipMtl);
-    mesh.transform.scale = vec3.fromValues(10, 10, 10);
+    this.rootComponent = new TSceneComponent(this, {
+      mass: 1,
+      linearDamping: 0.8,
+    });
+    this.rootComponent.collider = new TSphereCollider(16);
+    this.rootComponent.transform.translation = vec3.fromValues(100, -100, -20);
 
-    this.rootComponent.transform.translation = vec3.fromValues(0, 0, -20);
+    this.sprite = new TSpriteComponent(engine, this, 32, 32);
+    this.sprite.applyTexture(engine, shipTexture);
   }
 
   public setupController(controller: TController): void {
@@ -64,28 +69,45 @@ export default class Ship extends TPawn {
     this.velocity.x *= this.friction;
     this.velocity.y *= this.friction;
 
+    const force = 1000;
+
+    this.rootComponent.applyCentralForce(
+      vec3.fromValues(
+        force * this.controller.getAxisValue("MoveRight"),
+        force * this.controller.getAxisValue("MoveUp"),
+        0
+      )
+    );
+
     // Rotate the ship towards the mouse
     const mouse = this.controller.mouseLocation;
-    if (mouse?.worldX && mouse?.worldY) {
-      const dx = this.rootComponent.transform.translation[0] - mouse.worldX;
-      const dy = this.rootComponent.transform.translation[1] - mouse.worldY;
+    const camera = this.world?.gameState.activeCamera;
+
+    if (mouse && camera) {
+      const worldSpace = camera.clipToWorldSpace(mouse.clip);
+      const dx = this.rootComponent.transform.translation[0] - worldSpace[0];
+      const dy = this.rootComponent.transform.translation[1] - worldSpace[1];
       this.theta = Math.atan2(dy, dx);
 
       const q = quat.fromEuler(
         quat.create(),
         0,
         0,
-        (this.theta * 180) / Math.PI - 90
+        (this.theta * 180) / Math.PI + 90
       );
 
-      this.rootComponent.transform.rotation = q;
+      this.sprite.transform.rotation = q;
     }
 
-    this.rootComponent.transform.translation = vec3.add(
-      vec3.create(),
-      this.rootComponent.transform.translation,
-      vec3.fromValues(this.velocity.x, this.velocity.y, 0)
-    );
+    this.rootComponent.transform.translation[2] = -20;
+    // this.rootComponent.setLinearVelocity(
+    //   vec3.fromValues(this.velocity.x, this.velocity.y, 0)
+    // );
+    // this.rootComponent.transform.translation = vec3.add(
+    //   vec3.create(),
+    //   this.rootComponent.transform.translation,
+    //   vec3.fromValues(this.velocity.x, this.velocity.y, 0)
+    // );
   }
 
   public shootPressed() {

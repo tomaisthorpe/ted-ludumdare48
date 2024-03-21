@@ -26,8 +26,7 @@ export const generatePlanet = async (
   const ctx = canvas.getContext();
   drawCanvas(ctx, planetType, grid);
 
-  const texture = await canvas.getTexture();
-  texture.filter = TTextureFilter.Nearest;
+  const texture = await canvas.getTexture({ filter: TTextureFilter.Nearest });
 
   return { texture, size: planetSize };
 };
