@@ -32,5 +32,8 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       exclude: ["@tedengine/ted"],
     },
+    worker: {
+      format: "es",
+    },
   };
 });
