@@ -40,6 +40,7 @@ export default class Ship extends TPawn {
     this.rootComponent = new TSceneComponent(this, {
       mass: 1,
       linearDamping: 0.8,
+      fixedRotation: true,
     });
     this.rootComponent.collider = new TSphereCollider(16);
     this.rootComponent.transform.translation = vec3.fromValues(100, -100, -20);
