@@ -38,6 +38,9 @@ class Wall extends TActor {
 }
 
 class Planet extends TActor {
+  public width = 2000;
+  public height = 1600;
+
   constructor(engine: TEngine, texture: TTexture, state: GameState) {
     super();
 
@@ -62,6 +65,8 @@ class Planet extends TActor {
 
 class GameState extends TGameState {
   private background?: TTexture;
+  private player?: Ship;
+  private planet?: Planet;
 
   public async onCreate(engine: TEngine) {
     const rp = new TResourcePack(engine, Ship.resources);
@@ -73,6 +78,21 @@ class GameState extends TGameState {
     this.onReady(engine);
   }
 
+  public onUpdate() {
+    if (!this.planet) return;
+
+    const p = this.player?.rootComponent.getWorldTransform().translation;
+
+    const ctx = {
+      minimap: {
+        player: p
+          ? [p[0] / this.planet.width, p[1] / -this.planet.height]
+          : undefined,
+      },
+    };
+    this.engine.updateGameContext(ctx);
+  }
+
   public beforeWorldCreate() {
     // Disable gravity
     this.world!.config.gravity = vec3.fromValues(0, 0, 0);
@@ -82,16 +102,16 @@ class GameState extends TGameState {
   }
 
   public onReady(engine: TEngine) {
-    const planet = new Planet(engine, this.background!, this);
-    this.addActor(planet);
+    this.planet = new Planet(engine, this.background!, this);
+    this.addActor(this.planet);
 
     const onShoot = this.onShootHandler(engine).bind(this);
 
-    const ship = new Ship(engine, onShoot);
-    this.addActor(ship);
+    this.player = new Ship(engine, onShoot);
+    this.addActor(this.player);
 
     const controller = new Controller(engine);
-    controller.possess(ship);
+    controller.possess(this.player);
 
     const camera = new TOrthographicCamera(engine);
     this.activeCamera = camera;
@@ -104,7 +124,7 @@ class GameState extends TGameState {
         max: vec3.fromValues(1600, -300, 0),
       },
     });
-    cameraController.attachTo(ship.rootComponent);
+    cameraController.attachTo(this.player.rootComponent);
     camera.controller = cameraController;
   }
 
