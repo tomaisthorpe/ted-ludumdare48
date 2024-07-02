@@ -7,6 +7,7 @@ type PlanetGrid = [[number]];
 
 export interface GeneratePlanetResult {
   texture: TTexture;
+  image: ImageBitmap;
   size: PlanetSize;
 }
 
@@ -28,7 +29,11 @@ export const generatePlanet = async (
 
   const texture = await canvas.getTexture({ filter: TTextureFilter.Nearest });
 
-  return { texture, size: planetSize };
+  const image = await createImageBitmap(
+    ctx.getImageData(0, 0, planetSize[0], planetSize[1])
+  );
+
+  return { texture, image, size: planetSize };
 };
 
 const drawCanvas = (

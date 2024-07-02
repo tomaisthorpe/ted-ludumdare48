@@ -63,10 +63,31 @@ class Planet extends TActor {
   }
 }
 
+export interface MinimapInit {
+  type: "minimap.init";
+  payload: {
+    background: ImageBitmap;
+    width: number;
+    height: number;
+  };
+}
+
 class GameState extends TGameState {
   private background?: TTexture;
   private player?: Ship;
   private planet?: Planet;
+  private backgroundImage?: ImageBitmap;
+
+  public onEnter() {
+    this.engine.events.broadcast({
+      type: "minimap.init",
+      payload: {
+        background: this.backgroundImage!,
+        width: 200,
+        height: 200 * (this.planet!.height / this.planet!.width),
+      },
+    });
+  }
 
   public async onCreate(engine: TEngine) {
     const rp = new TResourcePack(engine, Ship.resources);
@@ -74,6 +95,7 @@ class GameState extends TGameState {
 
     const result = await generatePlanet(engine, planetTypes[0]);
     this.background = result.texture;
+    this.backgroundImage = result.image;
 
     this.onReady(engine);
   }
