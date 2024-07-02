@@ -78,6 +78,8 @@ class GameState extends TGameState {
   private planet?: Planet;
   private backgroundImage?: ImageBitmap;
 
+  private bullets: Bullet[] = [];
+
   public onEnter() {
     this.engine.events.broadcast({
       type: "minimap.init",
@@ -110,6 +112,12 @@ class GameState extends TGameState {
         player: p
           ? [p[0] / this.planet.width, p[1] / -this.planet.height]
           : undefined,
+        bullets: this.bullets
+          .filter((b) => !b.dead)
+          .map((b) => {
+            const t = b.rootComponent.getWorldTransform().translation;
+            return [t[0] / this.planet!.width, t[1] / -this.planet!.height];
+          }),
       },
     };
     this.engine.updateGameContext(ctx);
@@ -156,6 +164,8 @@ class GameState extends TGameState {
     return (x: number, y: number, theta: number) => {
       const bullet = new Bullet(engine, x, y, theta);
       this.addActor(bullet);
+
+      this.bullets.push(bullet);
     };
   }
 }
