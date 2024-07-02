@@ -1,4 +1,9 @@
-import { TActor, TEngine, TSphereComponent } from "@tedengine/ted";
+import {
+  TActor,
+  TEngine,
+  TSphereCollider,
+  TSphereComponent,
+} from "@tedengine/ted";
 import { vec3 } from "gl-matrix";
 
 export default class Bullet extends TActor {
@@ -10,26 +15,35 @@ export default class Bullet extends TActor {
     y: 0,
   };
   private readonly speed = 1000;
-  private lifetime = 2;
+  private lifetime = 1;
+
+  private fx: number;
+  private fy: number;
 
   constructor(engine: TEngine, x: number, y: number, theta: number) {
     super();
 
     new TSphereComponent(engine, this, 5, 5, 5);
 
+    this.rootComponent.collider = new TSphereCollider(8, "Bullet");
     this.rootComponent.transform.translation = vec3.fromValues(x, y, -10);
 
-    this.velocity.x = Math.cos(theta) * this.speed;
-    this.velocity.y = Math.sin(theta) * this.speed;
+    this.fx = Math.cos(theta) * this.speed;
+    this.fy = Math.sin(theta) * this.speed;
   }
 
   public onUpdate(_: TEngine, dt: number) {
-    this.rootComponent.transform.translation[0] += this.velocity.x * dt;
-    this.rootComponent.transform.translation[1] += this.velocity.y * dt;
+    this.rootComponent.setLinearVelocity(vec3.fromValues(this.fx, this.fy, 0));
 
     this.lifetime -= dt;
     if (this.lifetime <= 0) {
-      // @todo add this later
+      // this.destroy();
     }
+  }
+
+  public onWorldAdd() {
+    this.onEnterCollisionClass("Solid", () => {
+      // this.destroy();
+    });
   }
 }

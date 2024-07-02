@@ -105,6 +105,8 @@ class GameState extends TGameState {
   public onUpdate() {
     if (!this.planet) return;
 
+    this.bullets = this.bullets.filter((b) => !b.dead);
+
     const p = this.player?.rootComponent.getWorldTransform().translation;
 
     const ctx = {
@@ -125,9 +127,15 @@ class GameState extends TGameState {
 
   public beforeWorldCreate() {
     // Disable gravity
+    this.world!.config.mode = "2d";
     this.world!.config.gravity = vec3.fromValues(0, 0, 0);
     this.world!.config.collisionClasses.push({
       name: "Player",
+    });
+
+    this.world!.config.collisionClasses.push({
+      name: "Bullet",
+      ignores: ["Player"],
     });
   }
 
