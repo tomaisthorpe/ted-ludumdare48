@@ -37,13 +37,13 @@ export default class Bullet extends TActor {
 
     this.lifetime -= dt;
     if (this.lifetime <= 0) {
-      // this.destroy();
+      this.destroy();
     }
   }
 
   public onWorldAdd() {
     this.onEnterCollisionClass("Solid", () => {
-      // this.destroy();
+      this.destroy();
     });
   }
 }
