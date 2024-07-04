@@ -1,5 +1,6 @@
 import {
   TActor,
+  TActorPool,
   TEngine,
   TSphereCollider,
   TSphereComponent,
@@ -17,33 +18,47 @@ export default class Bullet extends TActor {
   private readonly speed = 1000;
   private lifetime = 1;
 
-  private fx: number;
-  private fy: number;
+  private fx?: number;
+  private fy?: number;
 
-  constructor(engine: TEngine, x: number, y: number, theta: number) {
+  public pool!: TActorPool<Bullet>;
+
+  constructor(engine: TEngine) {
     super();
+
+    console.log("new bullet");
 
     new TSphereComponent(engine, this, 5, 5, 5);
 
     this.rootComponent.collider = new TSphereCollider(8, "Bullet");
-    this.rootComponent.transform.translation = vec3.fromValues(x, y, -10);
-
-    this.fx = Math.cos(theta) * this.speed;
-    this.fy = Math.sin(theta) * this.speed;
   }
 
   public onUpdate(_: TEngine, dt: number) {
-    this.rootComponent.setLinearVelocity(vec3.fromValues(this.fx, this.fy, 0));
+    if (this.fx !== undefined && this.fy !== undefined) {
+      this.rootComponent.setLinearVelocity(
+        vec3.fromValues(this.fx, this.fy, 0)
+      );
+    }
 
     this.lifetime -= dt;
     if (this.lifetime <= 0) {
-      this.destroy();
+      this.pool.release(this);
     }
   }
 
   public onWorldAdd() {
     this.onEnterCollisionClass("Solid", () => {
-      this.destroy();
+      this.pool.release(this);
     });
+  }
+
+  public reset() {
+    this.lifetime = 1;
+  }
+
+  public setup(x: number, y: number, theta: number) {
+    this.rootComponent.transform.translation = vec3.fromValues(x, y, -10);
+    this.fx = Math.cos(theta) * this.speed;
+    this.fy = Math.sin(theta) * this.speed;
   }
 }

@@ -10,6 +10,7 @@ import {
   TBoxCollider,
   TOriginPoint,
   TSceneComponent,
+  TActorPool,
 } from "@tedengine/ted";
 import { generatePlanet } from "./generate-planet";
 import { vec3 } from "gl-matrix";
@@ -78,6 +79,7 @@ class GameState extends TGameState {
   private planet?: Planet;
   private backgroundImage?: ImageBitmap;
 
+  private bulletPool!: TActorPool<Bullet>;
   private bullets: Bullet[] = [];
 
   public onEnter() {
@@ -98,6 +100,8 @@ class GameState extends TGameState {
     const result = await generatePlanet(engine, planetTypes[0]);
     this.background = result.texture;
     this.backgroundImage = result.image;
+
+    this.bulletPool = new TActorPool<Bullet>(() => new Bullet(engine), 10);
 
     this.onReady(engine);
   }
@@ -143,7 +147,7 @@ class GameState extends TGameState {
     this.planet = new Planet(engine, this.background!, this);
     this.addActor(this.planet);
 
-    const onShoot = this.onShootHandler(engine).bind(this);
+    const onShoot = this.onShootHandler.bind(this);
 
     this.player = new Ship(engine, onShoot);
     this.addActor(this.player);
@@ -166,15 +170,14 @@ class GameState extends TGameState {
     camera.controller = cameraController;
   }
 
-  public onShootHandler(
-    engine: TEngine
-  ): (x: number, y: number, theta: number) => void {
-    return (x: number, y: number, theta: number) => {
-      const bullet = new Bullet(engine, x, y, theta);
+  public onShootHandler(x: number, y: number, theta: number): void {
+    const bullet = this.bulletPool.acquire();
+    if (bullet) {
+      bullet.setup(x, y, theta);
       this.addActor(bullet);
 
       this.bullets.push(bullet);
-    };
+    }
   }
 }
 
