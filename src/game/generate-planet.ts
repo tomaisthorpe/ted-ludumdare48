@@ -5,10 +5,13 @@ import { sizes, PlanetConfig, Color, PlanetSize } from "./config";
 type GridSize = [number, number];
 type PlanetGrid = [[number]];
 
+const difficulty = 1;
+
 export interface GeneratePlanetResult {
   texture: TTexture;
   image: ImageBitmap;
   size: PlanetSize;
+  enemyLocations: [number, number][];
 }
 
 export const generatePlanet = async (
@@ -33,7 +36,15 @@ export const generatePlanet = async (
     ctx.getImageData(0, 0, planetSize[0], planetSize[1])
   );
 
-  return { texture, image, size: planetSize };
+  const enemyLocations: [number, number][] = [];
+  for (let e = 0; e < 20 * difficulty; e++) {
+    const x = 200 + Math.floor(Math.random() * (planetSize[0] - 400));
+    const y = -(200 + Math.floor(Math.random() * (planetSize[1] - 400)));
+
+    enemyLocations.push([x, y]);
+  }
+
+  return { texture, image, size: planetSize, enemyLocations };
 };
 
 const drawCanvas = (

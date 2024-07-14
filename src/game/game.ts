@@ -19,6 +19,7 @@ import Ship from "./ship";
 import Controller from "./controller";
 import Bullet from "./bullet";
 import { planetTypes } from "./config";
+import Enemy from "./enemy";
 
 class Wall extends TActor {
   constructor(x: number, y: number, width: number, height: number) {
@@ -83,6 +84,9 @@ class GameState extends TGameState {
 
   private bulletPool!: TActorPool<Bullet>;
   private bullets: Bullet[] = [];
+  private enemies: Enemy[] = [];
+
+  private enemyLocations: [number, number][] = [];
 
   public onEnter() {
     this.engine.events.broadcast({
@@ -102,6 +106,7 @@ class GameState extends TGameState {
     const result = await generatePlanet(engine, planetTypes[0]);
     this.background = result.texture;
     this.backgroundImage = result.image;
+    this.enemyLocations = result.enemyLocations;
 
     this.bulletPool = new TActorPool<Bullet>(() => new Bullet(engine), 10);
 
@@ -124,6 +129,12 @@ class GameState extends TGameState {
           .filter((b) => !b.dead && b.acquired)
           .map((b) => {
             const t = b.rootComponent.getWorldTransform().translation;
+            return [t[0] / this.planet!.width, t[1] / -this.planet!.height];
+          }),
+        enemies: this.enemies
+          .filter((e) => !e.dead)
+          .map((e) => {
+            const t = e.rootComponent.getWorldTransform().translation;
             return [t[0] / this.planet!.width, t[1] / -this.planet!.height];
           }),
       },
@@ -170,6 +181,15 @@ class GameState extends TGameState {
     });
     cameraController.attachTo(this.player.rootComponent);
     camera.controller = cameraController;
+
+    // Spawn enemies
+    for (const [x, y] of this.enemyLocations) {
+      console.log(x, y);
+      const enemy = new Enemy(engine, x, y);
+      this.addActor(enemy);
+
+      this.enemies.push(enemy);
+    }
   }
 
   public onShootHandler(x: number, y: number, theta: number): void {

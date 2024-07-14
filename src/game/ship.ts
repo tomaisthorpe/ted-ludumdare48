@@ -102,7 +102,7 @@ export default class Ship extends TPawn {
       this.sprite.transform.rotation = q;
     }
 
-    this.rootComponent.transform.translation[2] = -20;
+    // this.rootComponent.transform.translation[2] = -20;
     // this.rootComponent.setLinearVelocity(
     //   vec3.fromValues(this.velocity.x, this.velocity.y, 0)
     // );

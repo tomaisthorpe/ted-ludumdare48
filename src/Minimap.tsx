@@ -41,7 +41,7 @@ export function Minimap() {
   if (!ctx) return null;
   if (!ctx.minimap) return null;
 
-  const { player, bullets } = ctx.minimap;
+  const { player, bullets, enemies } = ctx.minimap;
 
   return (
     <div
@@ -75,6 +75,19 @@ export function Minimap() {
             left: `${b[0] * 100}%`,
             width: 2,
             height: 2,
+            background: "rgb(255, 255, 255)",
+          }}
+        />
+      ))}
+      {enemies.map((b: [number, number], i: number) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            top: `${b[1] * 100}%`,
+            left: `${b[0] * 100}%`,
+            width: 3,
+            height: 3,
             background: "rgb(255, 0, 0)",
           }}
         />
