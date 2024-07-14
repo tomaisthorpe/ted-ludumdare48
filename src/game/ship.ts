@@ -6,6 +6,7 @@ import {
   TSceneComponent,
   TSphereCollider,
   TSpriteComponent,
+  TSpriteLayer,
 } from "@tedengine/ted";
 import type { TEngine } from "@tedengine/ted";
 import shipTexture from "../assets/player.png";
@@ -46,6 +47,7 @@ export default class Ship extends TPawn {
     this.rootComponent.transform.translation = vec3.fromValues(100, -100, -20);
 
     this.sprite = new TSpriteComponent(engine, this, 32, 32);
+    this.sprite.layer = TSpriteLayer.Foreground_0;
     this.sprite.applyTexture(engine, shipTexture);
   }
 

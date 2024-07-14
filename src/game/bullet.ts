@@ -2,12 +2,13 @@ import {
   TActor,
   TActorPool,
   TEngine,
+  TPoolableActor,
   TSphereCollider,
   TSphereComponent,
 } from "@tedengine/ted";
 import { vec3 } from "gl-matrix";
 
-export default class Bullet extends TActor {
+export default class Bullet extends TActor implements TPoolableActor {
   private velocity: {
     x: number;
     y: number;
@@ -22,13 +23,12 @@ export default class Bullet extends TActor {
   private fy?: number;
 
   public pool!: TActorPool<Bullet>;
+  public acquired: boolean = false;
 
   constructor(engine: TEngine) {
     super();
 
-    console.log("new bullet");
-
-    new TSphereComponent(engine, this, 5, 5, 5);
+    new TSphereComponent(engine, this, 5, 5, 2);
 
     this.rootComponent.collider = new TSphereCollider(8, "Bullet");
   }

@@ -11,6 +11,7 @@ import {
   TOriginPoint,
   TSceneComponent,
   TActorPool,
+  TSpriteLayer,
 } from "@tedengine/ted";
 import { generatePlanet } from "./generate-planet";
 import { vec3 } from "gl-matrix";
@@ -52,6 +53,7 @@ class Planet extends TActor {
       1600,
       TOriginPoint.TopLeft
     );
+    sprite.layer = TSpriteLayer.Foreground_0;
     sprite.setTexture(texture);
 
     this.rootComponent.transform.translation = vec3.fromValues(0, 0, -100);
@@ -109,7 +111,7 @@ class GameState extends TGameState {
   public onUpdate() {
     if (!this.planet) return;
 
-    this.bullets = this.bullets.filter((b) => !b.dead);
+    this.bullets = this.bullets.filter((b) => !b.dead && b.acquired);
 
     const p = this.player?.rootComponent.getWorldTransform().translation;
 
@@ -119,7 +121,7 @@ class GameState extends TGameState {
           ? [p[0] / this.planet.width, p[1] / -this.planet.height]
           : undefined,
         bullets: this.bullets
-          .filter((b) => !b.dead)
+          .filter((b) => !b.dead && b.acquired)
           .map((b) => {
             const t = b.rootComponent.getWorldTransform().translation;
             return [t[0] / this.planet!.width, t[1] / -this.planet!.height];
