@@ -57,7 +57,7 @@ export default class Ship extends TPawn {
     this.health -= dmg * 0.05;
 
     if (this.health <= 0) {
-      window.alert("Game Over");
+      console.log("game over");
       // Game over
     }
   }
