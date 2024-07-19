@@ -151,6 +151,10 @@ class GameState extends TGameState {
     });
 
     this.world!.config.collisionClasses.push({
+      name: "Enemy",
+    });
+
+    this.world!.config.collisionClasses.push({
       name: "Bullet",
       ignores: ["Player"],
     });
@@ -185,7 +189,7 @@ class GameState extends TGameState {
     // Spawn enemies
     for (const [x, y] of this.enemyLocations) {
       console.log(x, y);
-      const enemy = new Enemy(engine, x, y);
+      const enemy = new Enemy(engine, x, y, this.player);
       this.addActor(enemy);
 
       this.enemies.push(enemy);

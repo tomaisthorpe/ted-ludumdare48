@@ -7,15 +7,9 @@ import {
   TSphereComponent,
 } from "@tedengine/ted";
 import { vec3 } from "gl-matrix";
+import Enemy from "./enemy";
 
 export default class Bullet extends TActor implements TPoolableActor {
-  private velocity: {
-    x: number;
-    y: number;
-  } = {
-    x: 0,
-    y: 0,
-  };
   private readonly speed = 1000;
   private lifetime = 1;
 
@@ -49,6 +43,14 @@ export default class Bullet extends TActor implements TPoolableActor {
   public onWorldAdd() {
     this.onEnterCollisionClass("Solid", () => {
       this.pool.release(this);
+    });
+
+    this.onEnterCollisionClass("Enemy", (actor) => {
+      this.pool.release(this);
+
+      if (actor instanceof Enemy) {
+        (actor as Enemy).damage();
+      }
     });
   }
 

@@ -51,6 +51,14 @@ export default class Ship extends TPawn {
     this.sprite.applyTexture(engine, shipTexture);
   }
 
+  public getX() {
+    return this.rootComponent.transform.translation[0];
+  }
+
+  public getY() {
+    return this.rootComponent.transform.translation[1];
+  }
+
   public setupController(controller: TController): void {
     super.setupController(controller);
     controller.enableMouseTracking();
