@@ -8,6 +8,7 @@ import {
 } from "@tedengine/ted";
 import { vec3 } from "gl-matrix";
 import Enemy from "./enemy";
+import Ship from "./ship";
 
 export default class Bullet extends TActor implements TPoolableActor {
   private readonly speed = 1000;
@@ -18,6 +19,8 @@ export default class Bullet extends TActor implements TPoolableActor {
 
   public pool!: TActorPool<Bullet>;
   public acquired: boolean = false;
+
+  private target = "Enemy";
 
   constructor(engine: TEngine) {
     super();
@@ -45,11 +48,15 @@ export default class Bullet extends TActor implements TPoolableActor {
       this.pool.release(this);
     });
 
-    this.onEnterCollisionClass("Enemy", (actor) => {
+    this.onEnterCollisionClass(this.target, (actor) => {
       this.pool.release(this);
 
       if (actor instanceof Enemy) {
         (actor as Enemy).damage();
+      }
+
+      if (actor instanceof Ship) {
+        (actor as Ship).damage(100);
       }
     });
   }
@@ -58,9 +65,10 @@ export default class Bullet extends TActor implements TPoolableActor {
     this.lifetime = 1;
   }
 
-  public setup(x: number, y: number, theta: number) {
+  public setup(x: number, y: number, theta: number, target: string) {
     this.rootComponent.transform.translation = vec3.fromValues(x, y, -10);
     this.fx = Math.cos(theta) * this.speed;
     this.fy = Math.sin(theta) * this.speed;
+    this.target = target;
   }
 }

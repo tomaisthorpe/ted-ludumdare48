@@ -25,7 +25,9 @@ export default class Ship extends TPawn {
   };
   private readonly speed = 100;
   private readonly friction = 0.9;
-  private readonly fireRate = 0.2;
+  private readonly fireRate = 0.2 * 1000;
+
+  public health = 100;
 
   private lastShot = 0;
   private theta = 0;
@@ -49,6 +51,15 @@ export default class Ship extends TPawn {
     this.sprite = new TSpriteComponent(engine, this, 32, 32);
     this.sprite.layer = TSpriteLayer.Foreground_0;
     this.sprite.applyTexture(engine, shipTexture);
+  }
+
+  public damage(dmg: number) {
+    this.health -= dmg * 0.05;
+
+    if (this.health <= 0) {
+      window.alert("Game Over");
+      // Game over
+    }
   }
 
   public getX() {

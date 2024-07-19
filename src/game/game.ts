@@ -156,7 +156,6 @@ class GameState extends TGameState {
 
     this.world!.config.collisionClasses.push({
       name: "Bullet",
-      ignores: ["Player"],
     });
   }
 
@@ -186,10 +185,12 @@ class GameState extends TGameState {
     cameraController.attachTo(this.player.rootComponent);
     camera.controller = cameraController;
 
+    const onEnemyShoot = this.onEnemyShootHandler.bind(this);
+
     // Spawn enemies
     for (const [x, y] of this.enemyLocations) {
       console.log(x, y);
-      const enemy = new Enemy(engine, x, y, this.player);
+      const enemy = new Enemy(engine, x, y, this.player, onEnemyShoot);
       this.addActor(enemy);
 
       this.enemies.push(enemy);
@@ -199,7 +200,17 @@ class GameState extends TGameState {
   public onShootHandler(x: number, y: number, theta: number): void {
     const bullet = this.bulletPool.acquire();
     if (bullet) {
-      bullet.setup(x, y, theta);
+      bullet.setup(x, y, theta, "Enemy");
+      this.addActor(bullet);
+
+      this.bullets.push(bullet);
+    }
+  }
+
+  public onEnemyShootHandler(x: number, y: number, theta: number): void {
+    const bullet = this.bulletPool.acquire();
+    if (bullet) {
+      bullet.setup(x, y, theta, "Player");
       this.addActor(bullet);
 
       this.bullets.push(bullet);
