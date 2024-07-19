@@ -1,4 +1,4 @@
-import { useEventQueue, useGameContext } from "@tedengine/ted";
+import { useEventQueue, useGameContext, useUIContext } from "@tedengine/ted";
 import { useEffect, useRef, useState } from "react";
 import { MinimapInit } from "./game/game";
 
@@ -8,6 +8,7 @@ export function Minimap() {
   const ref = useRef<HTMLCanvasElement>(null);
   const [size, setSize] = useState<[number, number]>([0, 0]);
   const [background, setBackground] = useState<ImageBitmap>();
+  const { scaling } = useUIContext();
 
   useEffect(() => {
     events?.addListener<MinimapInit>("minimap.init", (event) => {
@@ -53,6 +54,8 @@ export function Minimap() {
         bottom: 0,
         right: 0,
         background: "rgba(0, 0, 0, 0.3)",
+        transform: `scale(${scaling})`,
+        transformOrigin: "bottom right",
       }}
     >
       <canvas ref={ref} width={size[0]} height={size[1]} />
