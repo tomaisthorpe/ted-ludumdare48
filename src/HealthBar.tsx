@@ -24,9 +24,7 @@ export function HealthBar() {
         style={{
           marginRight: "8px",
           color: healthColor,
-          textTransform: "uppercase",
           fontSize: "16px",
-          fontWeight: "bold",
         }}
       >
         Health
