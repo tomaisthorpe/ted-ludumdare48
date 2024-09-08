@@ -14,6 +14,7 @@ import {
   TSpriteLayer,
   TSound,
   TResourcePackConfig,
+  TCanvas,
 } from "@tedengine/ted";
 import { generatePlanet } from "./generate-planet";
 import { vec3 } from "gl-matrix";
@@ -124,7 +125,15 @@ class GameState extends TGameState {
     this.backgroundImage = result.image;
     this.enemyLocations = result.enemyLocations;
 
-    this.bulletPool = new TActorPool<Bullet>(() => new Bullet(engine), 10);
+    const canvas = new TCanvas(engine, 4, 8);
+    canvas.getContext().fillStyle = "red";
+    canvas.getContext().fillRect(0, 0, 4, 8);
+    const bulletTexture = await canvas.getTexture();
+
+    this.bulletPool = new TActorPool<Bullet>(
+      () => new Bullet(engine, bulletTexture),
+      10
+    );
 
     this.sounds.shoot = engine.resources.get<TSound>(shootSound);
 

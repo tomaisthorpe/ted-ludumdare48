@@ -2,16 +2,19 @@ import {
   TActor,
   TActorPool,
   TEngine,
+  TOriginPoint,
   TPoolableActor,
   TSphereCollider,
-  TSphereComponent,
+  TSpriteComponent,
+  TSpriteLayer,
+  TTexture,
 } from "@tedengine/ted";
-import { vec3 } from "gl-matrix";
+import { quat, vec3 } from "gl-matrix";
 import Enemy from "./enemy";
 import Ship from "./ship";
 
 export default class Bullet extends TActor implements TPoolableActor {
-  private readonly speed = 1000;
+  private readonly speed = 800;
   private lifetime = 1;
 
   private fx?: number;
@@ -21,11 +24,23 @@ export default class Bullet extends TActor implements TPoolableActor {
   public acquired: boolean = false;
 
   private target = "Enemy";
+  private sprite!: TSpriteComponent;
 
-  constructor(engine: TEngine) {
+  constructor(engine: TEngine, bulletTexture: TTexture) {
     super();
 
-    new TSphereComponent(engine, this, 5, 5, 2);
+    this.sprite = new TSpriteComponent(
+      engine,
+      this,
+      4,
+      8,
+      TOriginPoint.Center,
+      TSpriteLayer.Foreground_0,
+      {
+        fixedRotation: true,
+      }
+    );
+    this.sprite.setTexture(bulletTexture);
 
     this.rootComponent.collider = new TSphereCollider(8, "Bullet");
   }
@@ -76,6 +91,15 @@ export default class Bullet extends TActor implements TPoolableActor {
 
   public setup(x: number, y: number, theta: number, target: string) {
     this.rootComponent.transform.translation = vec3.fromValues(x, y, -10);
+
+    const degrees = (theta * 180) / Math.PI - 90;
+    this.sprite.transform.rotation = quat.fromEuler(
+      quat.create(),
+      0,
+      0,
+      degrees
+    );
+
     this.fx = Math.cos(theta) * this.speed;
     this.fy = Math.sin(theta) * this.speed;
     this.target = target;
