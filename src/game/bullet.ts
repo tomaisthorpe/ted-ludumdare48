@@ -31,15 +31,24 @@ export default class Bullet extends TActor implements TPoolableActor {
   }
 
   public onUpdate(_: TEngine, dt: number) {
+    // Pooled actors aren't dead, so need to use acquired to determine if it's active
+    // This potentially could result in unexpected bugs.
+    if (!this.acquired) {
+      return;
+    }
+
+    // This must be run before `setLinearVelocity` otherwise it will try update body
+    // on a released actor.
+    this.lifetime -= dt;
+    if (this.lifetime <= 0) {
+      this.pool.release(this);
+      return;
+    }
+
     if (this.fx !== undefined && this.fy !== undefined) {
       this.rootComponent.setLinearVelocity(
         vec3.fromValues(this.fx, this.fy, 0)
       );
-    }
-
-    this.lifetime -= dt;
-    if (this.lifetime <= 0) {
-      this.pool.release(this);
     }
   }
 
