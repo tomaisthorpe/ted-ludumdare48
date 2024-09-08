@@ -56,6 +56,7 @@ export function Minimap() {
         background: "rgba(0, 0, 0, 0.3)",
         transform: `scale(${scaling})`,
         transformOrigin: "bottom right",
+        pointerEvents: "none",
       }}
     >
       <canvas ref={ref} width={size[0]} height={size[1]} />

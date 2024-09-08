@@ -18,6 +18,7 @@ export function HealthBar() {
         alignItems: "center",
         transform: `scale(${scaling})`,
         transformOrigin: "top right",
+        pointerEvents: "none",
       }}
     >
       <div

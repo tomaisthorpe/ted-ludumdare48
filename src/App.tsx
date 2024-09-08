@@ -42,6 +42,7 @@ function EnemiesRemaining() {
         transform: `scale(${scaling})`,
         transformOrigin: "top left",
         fontSize: "12px",
+        pointerEvents: "none",
       }}
     >
       Enemies Remaining: {minimap.enemies.length}
@@ -63,6 +64,7 @@ function Controls() {
         textShadow: "0 1px 0 black",
         textAlign: "left",
         lineHeight: "1.6em",
+        pointerEvents: "none",
       }}
     >
       WASD / Arrow keys to move
