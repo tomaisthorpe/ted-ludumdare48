@@ -156,6 +156,7 @@ class GameState extends TGameState {
             return [t[0] / this.planet!.width, t[1] / -this.planet!.height];
           }),
       },
+      health: this.player?.health,
     };
     this.engine.updateGameContext(ctx);
   }

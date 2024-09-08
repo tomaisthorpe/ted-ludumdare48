@@ -3,6 +3,7 @@ import "./App.css";
 import { TGame } from "@tedengine/ted";
 import game from "./game/game?worker";
 import { Minimap } from "./Minimap";
+import { HealthBar } from "./HealthBar";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           game={new game()}
         >
           <Minimap />
+          <HealthBar />
         </TGame>
       </div>
     </>
