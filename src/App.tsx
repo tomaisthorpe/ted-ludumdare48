@@ -65,7 +65,7 @@ function Controls() {
         lineHeight: "1.6em",
       }}
     >
-      WASD/ Arrow keys to move
+      WASD / Arrow keys to move
       <br />
       Click to shoot
     </div>

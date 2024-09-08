@@ -64,8 +64,8 @@ export function Minimap() {
           position: "absolute",
           top: `${player[1] * 100}%`,
           left: `${player[0] * 100}%`,
-          width: 10,
-          height: 10,
+          width: 4,
+          height: 4,
           background: "rgb(255, 255, 0)",
         }}
       />
@@ -76,8 +76,8 @@ export function Minimap() {
             position: "absolute",
             top: `${b[1] * 100}%`,
             left: `${b[0] * 100}%`,
-            width: 2,
-            height: 2,
+            width: 1,
+            height: 1,
             background: "rgb(255, 255, 255)",
           }}
         />
@@ -89,8 +89,8 @@ export function Minimap() {
             position: "absolute",
             top: `${b[1] * 100}%`,
             left: `${b[0] * 100}%`,
-            width: 3,
-            height: 3,
+            width: 4,
+            height: 4,
             background: "rgb(255, 0, 0)",
           }}
         />
