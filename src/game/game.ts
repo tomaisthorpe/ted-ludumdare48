@@ -12,6 +12,8 @@ import {
   TSceneComponent,
   TActorPool,
   TSpriteLayer,
+  TSound,
+  TResourcePackConfig,
 } from "@tedengine/ted";
 import { generatePlanet } from "./generate-planet";
 import { vec3 } from "gl-matrix";
@@ -20,6 +22,7 @@ import Controller from "./controller";
 import Bullet from "./bullet";
 import { planetTypes } from "./config";
 import Enemy from "./enemy";
+import shootSound from "../assets/shoot.wav";
 
 class Wall extends TActor {
   constructor(x: number, y: number, width: number, height: number) {
@@ -88,6 +91,14 @@ class GameState extends TGameState {
 
   private enemyLocations: [number, number][] = [];
 
+  private resources: TResourcePackConfig = {
+    sounds: [shootSound],
+  };
+
+  private sounds: {
+    shoot?: TSound;
+  } = {};
+
   public onEnter() {
     this.engine.events.broadcast({
       type: "minimap.init",
@@ -100,7 +111,12 @@ class GameState extends TGameState {
   }
 
   public async onCreate(engine: TEngine) {
-    const rp = new TResourcePack(engine, Ship.resources);
+    const rp = new TResourcePack(
+      engine,
+      Ship.resources,
+      Enemy.resources,
+      this.resources
+    );
     await rp.load();
 
     const result = await generatePlanet(engine, planetTypes[0]);
@@ -109,6 +125,8 @@ class GameState extends TGameState {
     this.enemyLocations = result.enemyLocations;
 
     this.bulletPool = new TActorPool<Bullet>(() => new Bullet(engine), 10);
+
+    this.sounds.shoot = engine.resources.get<TSound>(shootSound);
 
     this.onReady(engine);
   }
@@ -172,6 +190,7 @@ class GameState extends TGameState {
     controller.possess(this.player);
 
     const camera = new TOrthographicCamera(engine);
+    camera.lerp = 0.9;
     this.activeCamera = camera;
     this.addActor(camera);
     const cameraController = new TFixedAxisCameraController({
@@ -181,6 +200,7 @@ class GameState extends TGameState {
         min: vec3.fromValues(400, -1300, 0),
         max: vec3.fromValues(1600, -300, 0),
       },
+      // leadFactor: 0.3,
     });
     cameraController.attachTo(this.player.rootComponent);
     camera.controller = cameraController;
@@ -204,6 +224,8 @@ class GameState extends TGameState {
       this.addActor(bullet);
 
       this.bullets.push(bullet);
+
+      this.sounds.shoot?.play();
     }
   }
 

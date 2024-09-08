@@ -7,13 +7,15 @@ import {
   TSpriteComponent,
   TSpriteLayer,
 } from "@tedengine/ted";
-import type { TEngine } from "@tedengine/ted";
-import shipTexture from "../assets/player.png";
+import type { TEngine, TSound } from "@tedengine/ted";
+import shipTexture from "../assets/enemy.png";
+import hitSound from "../assets/hit.wav";
 import Ship from "./ship";
 
 export default class Enemy extends TActor {
   public static resources: TResourcePackConfig = {
     textures: [shipTexture],
+    sounds: [hitSound],
   };
 
   private sprite: TSpriteComponent;
@@ -24,6 +26,8 @@ export default class Enemy extends TActor {
   private lastShot = 0;
 
   private angle = 0;
+
+  private hitSound?: TSound;
 
   constructor(
     engine: TEngine,
@@ -45,10 +49,14 @@ export default class Enemy extends TActor {
     this.sprite = new TSpriteComponent(engine, this, 32, 32);
     this.sprite.layer = TSpriteLayer.Foreground_0;
     this.sprite.applyTexture(engine, shipTexture);
+
+    this.hitSound = engine.resources.get<TSound>(hitSound);
   }
 
   public damage() {
     this.health -= 50;
+    this.hitSound?.play();
+
     if (this.health <= 0) {
       this.destroy();
     }

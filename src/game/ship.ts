@@ -8,12 +8,14 @@ import {
   TSpriteComponent,
   TSpriteLayer,
 } from "@tedengine/ted";
-import type { TEngine } from "@tedengine/ted";
+import type { TEngine, TSound } from "@tedengine/ted";
 import shipTexture from "../assets/player.png";
+import hitSound from "../assets/hit.wav";
 
 export default class Ship extends TPawn {
   public static resources: TResourcePackConfig = {
     textures: [shipTexture],
+    sounds: [hitSound],
   };
 
   private velocity: {
@@ -34,6 +36,8 @@ export default class Ship extends TPawn {
 
   private sprite: TSpriteComponent;
 
+  private hitSound?: TSound;
+
   constructor(
     engine: TEngine,
     private onShoot: (x: number, y: number, theta: number) => void
@@ -51,10 +55,14 @@ export default class Ship extends TPawn {
     this.sprite = new TSpriteComponent(engine, this, 32, 32);
     this.sprite.layer = TSpriteLayer.Foreground_0;
     this.sprite.applyTexture(engine, shipTexture);
+
+    this.hitSound = engine.resources.get<TSound>(hitSound);
   }
 
   public damage(dmg: number) {
     this.health -= dmg * 0.05;
+
+    this.hitSound?.play();
 
     if (this.health <= 0) {
       console.log("game over");
