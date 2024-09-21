@@ -1,4 +1,4 @@
-import { quat, vec3 } from "gl-matrix";
+import { quat, vec3, vec4 } from "gl-matrix";
 import {
   TActor,
   TResourcePackConfig,
@@ -19,6 +19,7 @@ export default class Enemy extends TActor {
   };
 
   private sprite: TSpriteComponent;
+  private shadow: TSpriteComponent;
 
   public health = 100;
 
@@ -49,6 +50,11 @@ export default class Enemy extends TActor {
     this.sprite = new TSpriteComponent(engine, this, 32, 32);
     this.sprite.layer = TSpriteLayer.Foreground_0;
     this.sprite.applyTexture(engine, shipTexture);
+
+    this.shadow = new TSpriteComponent(engine, this, 32, 32);
+    this.shadow.layer = TSpriteLayer.Midground_0;
+    this.shadow.colorFilter = vec4.fromValues(0, 0, 0, 0.1);
+    this.shadow.applyTexture(engine, shipTexture);
 
     this.hitSound = engine.resources.get<TSound>(hitSound);
   }
@@ -87,6 +93,12 @@ export default class Enemy extends TActor {
 
       this.attemptShoot();
     }
+
+    this.shadow.transform.translation[0] = this.sprite.transform.translation[0];
+    this.shadow.transform.translation[1] =
+      this.sprite.transform.translation[1] - 8;
+    this.shadow.transform.translation[2] = this.sprite.transform.translation[2];
+    this.shadow.transform.rotation = this.sprite.transform.rotation;
   }
 
   private attemptShoot() {

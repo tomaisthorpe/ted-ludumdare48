@@ -58,7 +58,7 @@ class Planet extends TActor {
       1600,
       TOriginPoint.TopLeft
     );
-    sprite.layer = TSpriteLayer.Foreground_0;
+    sprite.layer = TSpriteLayer.Background_0;
     sprite.setTexture(texture);
 
     this.rootComponent.transform.translation = vec3.fromValues(0, 0, -100);

@@ -1,4 +1,4 @@
-import { quat, vec3 } from "gl-matrix";
+import { quat, vec3, vec4 } from "gl-matrix";
 import {
   TController,
   TPawn,
@@ -35,7 +35,7 @@ export default class Ship extends TPawn {
   private theta = 0;
 
   private sprite: TSpriteComponent;
-
+  private shadow: TSpriteComponent;
   private hitSound?: TSound;
 
   constructor(
@@ -55,6 +55,11 @@ export default class Ship extends TPawn {
     this.sprite = new TSpriteComponent(engine, this, 32, 32);
     this.sprite.layer = TSpriteLayer.Foreground_0;
     this.sprite.applyTexture(engine, shipTexture);
+
+    this.shadow = new TSpriteComponent(engine, this, 32, 32);
+    this.shadow.layer = TSpriteLayer.Midground_0;
+    this.shadow.colorFilter = vec4.fromValues(0, 0, 0, 0.1);
+    this.shadow.applyTexture(engine, shipTexture);
 
     this.hitSound = engine.resources.get<TSound>(hitSound);
   }
@@ -129,15 +134,12 @@ export default class Ship extends TPawn {
       this.sprite.transform.rotation = q;
     }
 
-    // this.rootComponent.transform.translation[2] = -20;
-    // this.rootComponent.setLinearVelocity(
-    //   vec3.fromValues(this.velocity.x, this.velocity.y, 0)
-    // );
-    // this.rootComponent.transform.translation = vec3.add(
-    //   vec3.create(),
-    //   this.rootComponent.transform.translation,
-    //   vec3.fromValues(this.velocity.x, this.velocity.y, 0)
-    // );
+    // Update shadow to follow ship translation and rotation
+    this.shadow.transform.translation[0] = this.sprite.transform.translation[0];
+    this.shadow.transform.translation[1] =
+      this.sprite.transform.translation[1] - 8;
+    this.shadow.transform.translation[2] = this.sprite.transform.translation[2];
+    this.shadow.transform.rotation = this.sprite.transform.rotation;
   }
 
   public shootPressed() {
