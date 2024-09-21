@@ -200,7 +200,6 @@ class GameState extends TGameState {
     controller.possess(this.player);
 
     const camera = new TOrthographicCamera(engine);
-    camera.lerp = 0.9;
     this.activeCamera = camera;
     this.addActor(camera);
     const cameraController = new TFixedAxisCameraController({
@@ -210,7 +209,9 @@ class GameState extends TGameState {
         min: vec3.fromValues(400, -1300, 0),
         max: vec3.fromValues(1600, -300, 0),
       },
-      // leadFactor: 0.3,
+      leadFactor: 0.5,
+      maxLead: 150,
+      lerpFactor: 0.9,
     });
     cameraController.attachTo(this.player.rootComponent);
     camera.controller = cameraController;
