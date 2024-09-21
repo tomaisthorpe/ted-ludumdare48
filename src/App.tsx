@@ -14,6 +14,7 @@ function App() {
             renderWidth: 800,
             renderHeight: 600,
             imageRendering: "pixelated",
+            showAudioToggle: true,
           }}
           game={new game()}
         >
