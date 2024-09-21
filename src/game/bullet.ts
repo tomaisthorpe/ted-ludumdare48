@@ -93,7 +93,7 @@ export default class Bullet extends TActor implements TPoolableActor {
     this.rootComponent.transform.translation = vec3.fromValues(x, y, -10);
 
     const degrees = (theta * 180) / Math.PI - 90;
-    this.sprite.transform.rotation = quat.fromEuler(
+    this.rootComponent.transform.rotation = quat.fromEuler(
       quat.create(),
       0,
       0,
